@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.TagMapper">
+<!--    <sql id="all">-->
+<!--        id,avatar,tag_name as tagName-->
+<!--&lt;!&ndash;{articleId}可以理解为前端传来的&ndash;&gt;-->
+<!--    </sql>-->
+    <select id="findTagsByArticleId" parameterType="long" resultType="com.example.domain.Tag">
+        select id,avatar,tag_name as tagName from ms_tag
+        <where>
+            id in
+            (select tag_id from ms_article_tag where article_id = #{articleId})
+        </where>
+    </select>
+<!--group by分组 order 排序  desc降序  count(*)计算的是每个tag_id的个数，比如各个文章里面有好多标签 其中spring最多（5） mysql第二（2） count(*)算的就是5 2 limit取前limit行-->
+    <select id="findHotsTagIds" parameterType="int" resultType="java.lang.Long">
+        SELECT tag_id FROM ms_article_tag group by tag_id order by count(*) desc limit #{limit}
+    </select>
+<!--    根据tagId查id,tag_name 但由于tagId有好多 所以用foreach-->
+    <select id="findTagsByTagIds" parameterType="list" resultType="com.example.domain.Tag">
+        select id,tag_name as tagName from ms_tag
+        where id in
+        <foreach collection="list" item="tagId" separator="," open="(" close=")">
+            #{tagId}
+        </foreach>
+    </select>
+</mapper>

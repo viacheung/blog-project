@@ -1,0 +1,33 @@
+version: '3'
+services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    ports: #ports：绑定容器的端口到主机的端口，前者为主机端口；expose：将当前容器的端口暴露给link到本容器的容器。
+      - 80:80
+    links:
+      - app
+    depends_on:
+      - app
+    volumes: #将本地目录挂载到容器的目录下，前者为linux的目录，后者为容器目录。（访问容器的目录即可访问到被挂载目录下的所有文件）
+      - /mnt/docker/docker-compose/nginx/:/etc/nginx/
+    #   privileged: true
+    network_mode: "bridge"
+  app:
+    image: app
+    build: ./api
+    container_name: app
+    ports:
+      - 8888:8888
+    #    expose:
+    #      - "8888"
+    network_mode: "bridge"
+  admin:
+    image: admin
+    build: ./admin
+    container_name: admin
+    ports:
+      - 8889:8889
+    #    expose:
+    #      - "8889"
+    network_mode: "bridge"
